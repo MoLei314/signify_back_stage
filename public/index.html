@@ -2,34 +2,78 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Demo 操控後台</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>神之手 雙頻遙控器</title>
     <style>
-        body { margin: 0; display: flex; height: 100vh; font-family: sans-serif; }
+        body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; background-color: #f0f0f0; }
+        .btn-container { display: flex; flex-direction: column; flex: 1; }
         button {
-            flex: 1; font-size: 10vw; font-weight: bold; border: none; cursor: pointer;
-            transition: opacity 0.1s;
+            flex: 1; font-size: 15vw; font-weight: bold; border: none; cursor: pointer;
+            transition: opacity 0.1s; margin: 10px; border-radius: 20px;
         }
-        button:active { opacity: 0.7; }
-        .btn-correct { background-color: #000000; color: silver; }
-        .btn-incorrect { background-color: #272727; color: silver; }
+        button:active { opacity: 0.7; transform: scale(0.98); }
+        .btn-correct { background-color: #2ecc71; color: white; box-shadow: 0 10px #27ae60; }
+        .btn-incorrect { background-color: #e74c3c; color: white; box-shadow: 0 10px #c0392b; }
+        /* 狀態列的樣式 */
+        #status-panel { height: 60px; background: #333; color: #fff; padding: 10px; font-size: 14px; overflow-y: auto; font-family: monospace; }
+        .success { color: #2ecc71; }
+        .fail { color: #e74c3c; }
     </style>
 </head>
 <body>
-    <button class="btn-correct" onclick="sendTrigger('correct')">愛爽</button>
-    <button class="btn-incorrect" onclick="sendTrigger('incorrect')">愛祥</button>
+    <div class="btn-container">
+        <button class="btn-correct" onclick="sendTrigger('correct')">正確</button>
+        <button class="btn-incorrect" onclick="sendTrigger('incorrect')">不正確</button>
+    </div>
+
+    <div id="status-panel">等待發送指令...</div>
 
     <script>
-        function sendTrigger(status) {
-            // 發送 Request 給同一台 Server
-            fetch('/api/trigger', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: status })
-            })
-            .then(res => res.json())
-            .then(data => console.log("已傳送:", data))
-            .catch(err => console.error("錯誤:", err));
+        // 🌟 請在這裡填寫您的兩個伺服器「網頁」網址 (結尾不用加斜線)
+        // 注意：這裡是用 https://，因為是網頁發送 API，不是用 wss://
+        const renderUrl = "https://signify-back-stage.onrender.com";
+        const ngrokUrl = "https://uncropped-prissily-elida.ngrok-free.dev"; 
+        
+        // 備註：如果您還有連同一個手機熱點的區域網路，也可以加進來！
+        // const localUrl = "http://192.168.137.55:3000"; 
+
+        const statusPanel = document.getElementById('status-panel');
+
+        function logStatus(msg) {
+            statusPanel.innerHTML = msg;
+        }
+
+        async function sendTrigger(status) {
+            logStatus(`發送 [${status === 'correct' ? '正確' : '不正確'}] 中...`);
+
+            // 定義發送給單一伺服器的函式
+            const sendToServer = async (serverName, baseUrl) => {
+                try {
+                    const response = await fetch(`${baseUrl}/api/trigger`, {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            // ngrok 的防護機制繞過設定
+                            'ngrok-skip-browser-warning': 'true' 
+                        },
+                        body: JSON.stringify({ status: status })
+                    });
+                    
+                    if (response.ok) return `<span class="success">✔ ${serverName} 接收成功</span>`;
+                    else throw new Error('伺服器回報錯誤');
+                } catch (error) {
+                    return `<span class="fail">✖ ${serverName} 連線失敗</span>`;
+                }
+            };
+
+            // 🚀 雙發廣播核心：同時並行發送給兩個伺服器 (Promise.all)
+            const results = await Promise.all([
+                sendToServer("Render", renderUrl),
+                sendToServer("Ngrok", ngrokUrl)
+            ]);
+
+            // 將兩個伺服器的結果顯示在下方黑條中
+            logStatus(results.join(" | "));
         }
     </script>
 </body>
