@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>神之手 雙頻遙控器</title>
+    <title>signify back stage</title>
     <style>
         body { margin: 0; display: flex; flex-direction: column; height: 100vh; font-family: sans-serif; background-color: #f0f0f0; }
         .btn-container { display: flex; flex-direction: column; flex: 1; }
@@ -12,8 +12,8 @@
             transition: opacity 0.1s; margin: 10px; border-radius: 20px;
         }
         button:active { opacity: 0.7; transform: scale(0.98); }
-        .btn-correct { background-color: #2ecc71; color: white; box-shadow: 0 10px #27ae60; }
-        .btn-incorrect { background-color: #e74c3c; color: white; box-shadow: 0 10px #c0392b; }
+        .btn-correct { background-color: 	#000000; color: silver; box-shadow: 0 10px #000000; }
+        .btn-incorrect { background-color: #272727; color: silver; box-shadow: 0 10px #272727; }
         /* 狀態列的樣式 */
         #status-panel { height: 60px; background: #333; color: #fff; padding: 10px; font-size: 14px; overflow-y: auto; font-family: monospace; }
         .success { color: #2ecc71; }
@@ -22,8 +22,8 @@
 </head>
 <body>
     <div class="btn-container">
-        <button class="btn-correct" onclick="sendTrigger('correct')">正確</button>
-        <button class="btn-incorrect" onclick="sendTrigger('incorrect')">不正確</button>
+        <button class="btn-correct" onclick="sendTrigger('correct')">愛爽</button>
+        <button class="btn-incorrect" onclick="sendTrigger('incorrect')">愛祥</button>
     </div>
 
     <div id="status-panel">等待發送指令...</div>
