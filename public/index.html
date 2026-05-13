@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo 操控後台</title>
+    <style>
+        body { margin: 0; display: flex; height: 100vh; font-family: sans-serif; }
+        button {
+            flex: 1; font-size: 10vw; font-weight: bold; border: none; cursor: pointer;
+            transition: opacity 0.1s;
+        }
+        button:active { opacity: 0.7; }
+        .btn-correct { background-color: #000000; color: silver; }
+        .btn-incorrect { background-color: #272727; color: silver; }
+    </style>
+</head>
+<body>
+    <button class="btn-correct" onclick="sendTrigger('correct')">愛爽</button>
+    <button class="btn-incorrect" onclick="sendTrigger('incorrect')">愛祥</button>
+
+    <script>
+        function sendTrigger(status) {
+            // 發送 Request 給同一台 Server
+            fetch('/api/trigger', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ status: status })
+            })
+            .then(res => res.json())
+            .then(data => console.log("已傳送:", data))
+            .catch(err => console.error("錯誤:", err));
+        }
+    </script>
+</body>
+</html>
